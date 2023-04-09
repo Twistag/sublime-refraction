@@ -1,0 +1,38 @@
+[
+    {
+        "caption": "Refraction: Detect Bugs",
+        "command": "refraction_bugs"
+    },
+    {
+        "caption": "Refraction: Add Debug Statements",
+        "command": "refraction_debug"
+    },
+    {
+        "caption": "Refraction: Create Documentation",
+        "command": "refraction_documentation"
+    },
+    {
+        "caption": "Refraction: Separate Hardcoded Literals",
+        "command": "refraction_literals"
+    },
+    {
+        "caption": "Refraction: Refactor Code",
+        "command": "refraction_refactor"
+    },
+    {
+        "caption": "Refraction: Style Check",
+        "command": "refraction_style"
+    },
+    {
+        "caption": "Refraction: Generate Unit Tests",
+        "command": "refraction_unit_tests"
+    },
+    {
+        "caption": "Refraction: Add Types",
+        "command": "refraction_types"
+    },
+        {
+        "caption": "Refraction: Enter User Credentials",
+        "command": "refraction_input_user_credentials"
+    }
+]
