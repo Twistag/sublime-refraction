@@ -1,0 +1,14 @@
+{
+  "name": "Refraction",
+  "version": "1.0",
+  "description": "Learn, improve and generate code with AI",
+  "author": "Hayden Bleasel",
+  "email": "hello@haydenbleasel.com",
+  "url": "https://www.refraction.dev/",
+  "license": "",
+  "dependencies": [],
+  "pre_install": [],
+  "post_install": [],
+  "pre_uninstall": [],
+  "post_uninstall": []
+}

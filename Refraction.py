@@ -18,7 +18,7 @@ def get_selected_text(self):
 
 def get_code_and_lang(self):
     code = get_selected_text(self)
-    lang = "Python"
+    lang = "java"
     data = {
         'code': code,
         'language': lang
@@ -34,27 +34,44 @@ def authenticate(data, callback):
     else:
         callback()
 
+def get_supported_languages(self, callback):
+    request_body = get_code_and_lang(self)
+    response = call_backend("/api/vscode/languages", request_body)
+    callback(response.read().decode('utf-8'))
+    
+def get_supported_languages_async(self, callback):
+    call_languages_service = lambda: get_supported_languages(self, callback)
+    send_request_async(call_languages_service)
+    
+
 
 def get_generated_data(utility, request_body, callback):
-    with call_backend('/api/generate/' + utility, request_body) as response:
-        callback("\n\n", 0)
-        offset = len("\n\n")
-        while not response.closed:
-            ready_to_read, _, _ = select.select([response], [], [], 0.1)
+    offset = 0
 
-            if response in ready_to_read:
-                line = response.readline().decode()
-                if not line:
-                    break
+    try:
+        with call_backend('/api/generate/' + utility, request_body) as response:
+            callback("\n\n", 0)
+            offset += len("\n\n")
+            while not response.closed:
+                ready_to_read, _, _ = select.select([response], [], [], 0.1)
 
-                time.sleep(0.005)
-                callback(line, offset)
-                offset += len(line)
+                if response in ready_to_read:
+                    line = response.readline().decode()
+                    if not line:
+                        break
 
+                    time.sleep(0.005)
+                    callback(line, offset)
+                    offset += len(line)
+    finally:
+        callback('\n', offset)
 
-def generate_async(self, utility):
+        
+
+def generate_async(self, utility, framework = None):
     auth_credentials = get_auth_credentials()
     request_body = get_code_and_lang(self)
+    request_body['framework'] = framework
     if is_empty_string(auth_credentials['userId']):
         sublime.error_message('Please set your Refraction User ID. Use method "Refraction: Enter User Credentials"')
     elif is_empty_string(request_body['code']):
@@ -70,7 +87,6 @@ def generate_async(self, utility):
         send_request_async(call_auth)
 
 def print_response_data(self, response_data, offset):
-    print(response_data)
     self.view.run_command("insert_after_selection", {"text": response_data, 'offset': offset})
 
 
@@ -166,15 +182,38 @@ class RefractionTypesCommand(sublime_plugin.TextCommand):
         generate_async(self, 'types')
 
 
+
+def handle_languages_response(self, languages):
+    file_language = get_code_and_lang(self)['language']
+    languages = eval(languages)
+    languages = list(filter(lambda lang: file_language == lang['value'], languages))
+    if len(languages) == 0:
+        sublime.error_message("Language not supported.")
+    else:
+        frameworks = list(map(lambda fram: fram['label'], languages[0]['frameworks']))
+        sublime.active_window().run_command("refraction_ask_user_to_choose_framework", {"frameworks": frameworks})
+
+
 class RefractionUnitTestsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        self.view.insert(edit, 0, "unit-tests")
+        get_supported_languages_async(self, lambda languages: handle_languages_response(self, languages))
 
 
 class InsertAfterSelectionCommand(sublime_plugin.TextCommand):
     def run(self, edit, text, offset):
         for region in self.view.sel():
             self.view.insert(edit, region.end() + offset, text)
+
+
+class RefractionAskUserToChooseFrameworkCommand(sublime_plugin.TextCommand):
+    def run(self, edit, frameworks):
+
+        def on_done(index):
+            selected_answer = frameworks[index]
+            generate_async(self, 'unit-tests', selected_answer)
+
+        sublime.active_window().show_quick_panel(frameworks, on_done)
+
 
 
 class RefractionInputUserCredentialsCommand(sublime_plugin.TextCommand):
