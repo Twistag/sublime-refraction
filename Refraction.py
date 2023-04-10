@@ -18,10 +18,10 @@ def get_selected_text(self):
 
 def get_code_and_lang(self):
     code = get_selected_text(self)
-    lang = "java"
+    lang = self.view.settings().get('syntax').split('/')[-1].split('.')[0]
     data = {
         'code': code,
-        'language': lang
+        'language': lang.lower()
     }
     return data
 
