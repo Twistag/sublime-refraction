@@ -34,5 +34,14 @@
         {
         "caption": "Refraction: Enter User Credentials",
         "command": "refraction_input_user_credentials"
-    }
+    },
+	{
+		"caption": "Preferences: Refraction Settings",
+		"command": "edit_settings",
+		"args":
+		{
+		    "base_file": "${packages}/Refraction/Refraction.sublime-settings",
+		    "default": "// Refraction Settings - User\n{\n\t$0\n}\n"
+		}
+	}
 ]
