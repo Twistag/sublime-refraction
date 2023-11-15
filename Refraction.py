@@ -6,7 +6,7 @@ import select
 import time
 
 
-BASE_URL = "https://www.refraction.dev"
+BASE_URL = "https://app.refraction.dev"
 
 
 # Sublime Services
